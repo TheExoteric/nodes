@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nodes : The Exoteric</title>
+    <!-- style settings for the control panel -->
+    <style>
+        /* set the default styles for the page */
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #FFF;
+            font-family: sans-serif;
+        }
+
+        /* style the canvas */
+        canvas {
+            display: block;
+            overflow: hidden;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+        }
+
+        p>a,
+        p>a:visited {
+            color: #67ff73;
+        }
+
+        /* control panel */
+        #controls {
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 40px auto auto 40px;
+            padding: 20px;
+            width: 460px;
+            border-radius: 5px;
+            border: 1px solid #555555;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #FFF;
+            font-family: sans-serif;
+            font-size: 12px;
+        }
+
+        /* input styles */
+        label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        /* number controls */
+        input[type=number] {
+            width: 60px;
+            margin-left: auto;
+            padding: 2px;
+            text-align: right;
+        }
+
+        /* text input controls */
+        input[type=text] {
+            width: 60px;
+            margin-left: auto;
+            padding: 2px;
+        }
+
+        /* slider controls */
+        input[type=range] {
+            margin-right: 12px;
+            margin-left: auto;
+            width: 300px;
+        }
+
+        /* color picker controls */
+        input[type=color] {
+            margin: 0 0 0 12px;
+            padding: 0;
+            height: 23px;
+        }
+
+        .toggle-link,
+        toggle-link:visited {
+            text-decoration: none;
+            color: #FFF;
+            border: 1px solid #FFF;
+            /* or another color that matches your design */
+            padding: 5px 12px;
+            border-radius: 5px;
+            display: inline-block;
+            transform: rotate(180deg);
+            float: right;
+            clear: both;
+            margin-top: -42px;
+        }
+
+        .toggle-link.flipped {
+            transform: rotate(0deg);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="controls">
+        <h1>Nodes</h1>
+        <h2>An Exoteric Visual</h2>
+        <a href="#" id="toggleSettings" class="toggle-link" title="Show / Hide Settings">^</a>
+        <div id="settings">
+            <p>Press <strong id="instruction">Ctrl+S</strong> to save a copy of this project!</p>
+            <hr>
+            <h2>Settings</h2>
+            <h3>Nodes</h3>
+            <label title="The number of nodes being rendered.">Number:
+                <div class="input-group">
+                    <input type="range" id="nodeCountSlider" min="2" max="120" value="22">
+                    <input type="number" id="nodeCountNumber" min="2" max="120" value="22">
+                </div>
+            </label><br>
+            <label title="Node width.">Size:
+                <div class="input-group">
+                    <input type="range" id="nodeSizeSlider" min="1" max="300" value="130">
+                    <input type="number" id="nodeSizeNumber" min="1" max="300" value="130">
+                </div>
+            </label><br>
+            <label title="Node color.">Color:
+                <div class="input-group">
+                    <input type="color" id="nodeColorPicker" value="#FF22CC">
+                    <input type="text" id="nodeColorText" value="#FF22CC">
+                    <input type="color" id="nodeEndColorPicker" value="#22FFCC">
+                    <input type="text" id="nodeEndColorText" value="#22FFCC">
+                </div>
+            </label><br>
+            <label title="Node transparency.">Opacity:
+                <div class="input-group">
+                    <input type="range" id="nodeOpacitySlider" min="0" max="1.00" step="0.01" value="0.45">
+                    <input type="number" id="nodeOpacityNumber" min="0" max="1.00" step="0.01" value="0.45">
+                </div>
+            </label><br>
+            <h3>Edges</h3>
+            <label title="Distance between nodes an edge becomes active.">Range:
+                <div class="input-group">
+                    <input type="range" id="edgeRangeSlider" min="1" max="600" value="110">
+                    <input type="number" id="edgeRangeNumber" min="1" max="600" value="110">
+                </div>
+            </label><br>
+            <label title="How wide edge display is.">Width:
+                <div class="input-group">
+                    <input type="range" id="edgeWidthSlider" min="1" max="250" value="2">
+                    <input type="number" id="edgeWidthNumber" min="1" max="250" value="2">
+                </div>
+            </label><br>
+            <label title="Edge color.">Color:
+                <div class="input-group">
+                    <input type="checkbox" id="edgeHorizontalGradient" checked> Horizontal
+                    <input type="color" id="edgeColorPicker" value="#DDFF22">
+                    <input type="text" id="edgeColorText" value="#DDFF22">
+                    <input type="color" id="edgeEndColorPicker" value="#FF22DD">
+                    <input type="text" id="edgeEndColorText" value="#FF22DD">
+                </div>
+            </label><br>
+            <label title="Edge max opacity.">Opacity:
+                <div class="input-group">
+                    <input type="range" id="edgeOpacitySlider" min="0.00" max="1.00" step="0.01" value="0.76">
+                    <input type="number" id="edgeOpacityNumber" min="0.00" max="1.00" step="0.01" value="0.76">
+                </div>
+            </label><br>
+            <h3>Simulation</h3>
+            <label title="How fast the simulation runs.">Speed:
+                <div class="input-group">
+                    <input type="range" id="simSpeedSlider" min="0" max="10" step="0.01" value="0.60">
+                    <input type="number" id="simSpeedNumber" min="0" max="10" step="0.01" value="0.60">
+                </div>
+            </label><br>
+            <label title="Variation in node speed. Sets the range of min and max speeds.">Variation:
+                <div class="input-group">
+                    <input type="range" id="simVarianceSlider" min="0" max="2.0" step="0.01" value="0.2">
+                    <input type="number" id="simVarianceNumber" min="0" max="2.0" step="0.01" value="0.2">
+                </div>
+            </label><br>
+            <label title="How many of the nodes pass through the edge of the viewport vs. bouncing back.">Permeability:
+                <div class="input-group">
+                    <input type="range" id="simPermeableSlider" min="0" max="1.00" step="0.01" value="0.80">
+                    <input type="number" id="simPermeableNumber" min="0" max="1.00" step="0.01" value="0.80">
+                </div>
+            </label><br>
+            <label title="Background color.">Color:
+                <div class="input-group">
+                    <input type="checkbox" id="backgroundHorizontalGradient" checked> Horizontal
+                    <input type="color" id="backgroundColorPicker" value="#DDFF22">
+                    <input type="text" id="backgroundColorText" value="#DDFF22">
+                    <input type="color" id="backgroundEndColorPicker" value="#FF22DD">
+                    <input type="text" id="backgroundEndColorText" value="#FF22DD">
+                </div>
+            </label><br>
+        </div>
+        <hr>
+        <p>Project &amp; Content &copy; 2023 <a href="https://www.theexoteric.com">The Exoteric</a>. All rights
+            reserved.</p>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+</body>
+<!-- Load script after body is loaded -->
+<script>
+    // sliders for number of nodes
+    var nodeCountSlider = document.getElementById('nodeCountSlider');
+    var nodeCountNumber = document.getElementById('nodeCountNumber');
+    // Function to update the number field when the slider changes
+    nodeCountSlider.addEventListener('input', function () {
+        nodeCountNumber.value = nodeCountSlider.value;
+        nodeCount = +nodeCountSlider.value;
+        generateNodes(nodeCount);
+    });
+    // Function to update the slider when the number field changes
+    nodeCountNumber.addEventListener('input', function () {
+        nodeCountSlider.value = nodeCountNumber.value;
+        generateNodes(nodeCount);
+    });
+
+    // sliders for the node size
+    var nodeSizeSlider = document.getElementById('nodeSizeSlider');
+    var nodeSizeNumber = document.getElementById('nodeSizeNumber');
+    // Function to update the number field when the slider changes
+    nodeSizeSlider.addEventListener('input', function () {
+        nodeSizeNumber.value = nodeSizeSlider.value;
+    });
+    // Function to update the slider when the number field changes
+    nodeSizeNumber.addEventListener('input', function () {
+        nodeSizeSlider.value = nodeSizeNumber.value;
+    });
+
+    // picker for node color
+    var nodeColorPicker = document.getElementById('nodeColorPicker');
+    var nodeColorText = document.getElementById('nodeColorText');
+    // Function to update the number field when the slider changes
+    nodeColorPicker.addEventListener('input', function () {
+        nodeColorText.value = nodeColorPicker.value;
+        generateNodes(nodeCount);
+    });
+    // Function to update the slider when the number field changes
+    nodeColorText.addEventListener('input', function () {
+        nodeColorPicker.value = nodeColorText.value;
+        generateNodes(nodeCount);
+    });
+
+    // picker for node color
+    var nodeEndColorPicker = document.getElementById('nodeEndColorPicker');
+    var nodeEndColorText = document.getElementById('nodeColorText');
+    // Function to update the number field when the slider changes
+    nodeEndColorPicker.addEventListener('input', function () {
+        nodeEndColorText.value = nodeEndColorPicker.value;
+        generateNodes(nodeCount);
+    });
+    // Function to update the slider when the number field changes
+    nodeEndColorText.addEventListener('input', function () {
+        nodeEndColorPicker.value = nodeEndColorText.value;
+        generateNodes(nodeCount);
+    });
+
+    // sliders for the node transparency
+    var nodeOpacitySlider = document.getElementById('nodeOpacitySlider');
+    var nodeOpacityNumber = document.getElementById('nodeOpacityNumber');
+    // Function to update the number field when the slider changes
+    nodeOpacitySlider.addEventListener('input', function () {
+        nodeOpacityNumber.value = nodeOpacitySlider.value;
+    });
+    // Function to update the slider when the number field changes
+    nodeOpacityNumber.addEventListener('input', function () {
+        nodeOpacitySlider.value = nodeOpacityNumber.value;
+    });
+
+    // sliders for the distance between nodes edges become active
+    var edgeRangeSlider = document.getElementById('edgeRangeSlider');
+    var edgeRangeNumber = document.getElementById('edgeRangeNumber');
+    // Function to update the number field when the slider changes
+    edgeRangeSlider.addEventListener('input', function () {
+        edgeRangeNumber.value = edgeRangeSlider.value;
+    });
+    // Function to update the slider when the number field changes
+    edgeRangeNumber.addEventListener('input', function () {
+        edgeRangeSlider.value = edgeRangeNumber.value;
+    });
+
+    // sliders for the edge display width
+    var edgeWidthSlider = document.getElementById('edgeWidthSlider');
+    var edgeWidthNumber = document.getElementById('edgeWidthNumber');
+    // Function to update the number field when the slider changes
+    edgeWidthSlider.addEventListener('input', function () {
+        edgeWidthNumber.value = edgeWidthSlider.value;
+    });
+    // Function to update the slider when the number field changes
+    edgeWidthNumber.addEventListener('input', function () {
+        edgeWidthSlider.value = edgeWidthNumber.value;
+    });
+
+    // picker for edge color
+    var edgeColorPicker = document.getElementById('edgeColorPicker');
+    var edgeColorText = document.getElementById('nodeColorText');
+    // Function to update the number field when the slider changes
+    edgeColorPicker.addEventListener('input', function () {
+        edgeColorText.value = edgeColorPicker.value;
+    });
+    // Function to update the slider when the number field changes
+    edgeColorText.addEventListener('input', function () {
+        edgeColorPicker.value = edgeColorText.value;
+    });
+
+    // picker for edge color
+    var edgeEndColorPicker = document.getElementById('edgeEndColorPicker');
+    var edgeEndColorText = document.getElementById('edgeEndColorText');
+    // Function to update the number field when the slider changes
+    edgeEndColorPicker.addEventListener('input', function () {
+        edgeEndColorText.value = edgeEndColorPicker.value;
+    });
+    // Function to update the slider when the number field changes
+    edgeEndColorText.addEventListener('input', function () {
+        edgeEndColorPicker.value = edgeEndColorText.value;
+    });
+
+    // sliders for the edge transparency
+    var edgeOpacitySlider = document.getElementById('edgeOpacitySlider');
+    var edgeOpacityNumber = document.getElementById('edgeOpacityNumber');
+    // Function to update the number field when the slider changes
+    edgeOpacitySlider.addEventListener('input', function () {
+        edgeOpacityNumber.value = edgeOpacitySlider.value;
+    });
+    // Function to update the slider when the number field changes
+    edgeOpacityNumber.addEventListener('input', function () {
+        edgeOpacitySlider.value = edgeOpacityNumber.value;
+    });
+
+    // sliders for the edge display width
+    var simSpeedSlider = document.getElementById('simSpeedSlider');
+    var simSpeedNumber = document.getElementById('simSpeedNumber');
+    // Function to update the number field when the slider changes
+    simSpeedSlider.addEventListener('input', function () {
+        simSpeedNumber.value = simSpeedSlider.value;
+        generateNodes(nodeCount);
+    });
+    // Function to update the slider when the number field changes
+    simSpeedNumber.addEventListener('input', function () {
+        simSpeedSlider.value = simSpeedNumber.value;
+        generateNodes(nodeCount);
+    });
+
+    // sliders for the edge display width
+    var simVarianceSlider = document.getElementById('simVarianceSlider');
+    var simVarianceNumber = document.getElementById('simVarianceNumber');
+    // Function to update the number field when the slider changes
+    simVarianceSlider.addEventListener('input', function () {
+        simVarianceNumber.value = simVarianceSlider.value;
+        generateNodes(nodeCount);
+    });
+    // Function to update the slider when the number field changes
+    simVarianceNumber.addEventListener('input', function () {
+        simVarianceSlider.value = simVarianceNumber.value;
+        generateNodes(nodeCount);
+    });
+
+    // sliders for the edge display width
+    var simPermeableSlider = document.getElementById('simPermeableSlider');
+    var simPermeableNumber = document.getElementById('simPermeableNumber');
+    // Function to update the number field when the slider changes
+    simPermeableSlider.addEventListener('input', function () {
+        simPermeableNumber.value = simPermeableSlider.value;
+    });
+    // Function to update the slider when the number field changes
+    simPermeableNumber.addEventListener('input', function () {
+        simPermeableSlider.value = simPermeableNumber.value;
+    });
+
+    // picker for background color
+    var backgroundColorPicker = document.getElementById('backgroundColorPicker');
+    var backgroundColorText = document.getElementById('backgroundColorText');
+    // Function to update the number field when the slider changes
+    backgroundColorPicker.addEventListener('input', function () {
+        backgroundColorText.value = backgroundColorPicker.value;
+    });
+    // Function to update the slider when the number field changes
+    backgroundColorText.addEventListener('input', function () {
+        backgroundColorPicker.value = backgroundColorText.value;
+    });
+
+    // picker for background color
+    var backgroundEndColorPicker = document.getElementById('backgroundEndColorPicker');
+    var backgroundEndColorText = document.getElementById('backgroundEndColorText');
+    // Function to update the number field when the slider changes
+    backgroundEndColorPicker.addEventListener('input', function () {
+        backgroundEndColorText.value = backgroundEndColorPicker.value;
+    });
+    // Function to update the slider when the number field changes
+    backgroundEndColorText.addEventListener('input', function () {
+        backgroundEndColorPicker.value = backgroundEndColorText.value;
+    });
+
+
+    // canvas setup
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    // save a copy of the project instructions
+    var saveInstruction = document.getElementById('instruction');
+
+    // update instruction for mac users (they need special help)
+    if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
+        saveInstruction.textContent = 'Cmd+S';
+    }
+
+    // update canvas size if user resizes the window
+    function updateCanvasSize() {
+        canvas.width = window.innerWidth / 2;
+        canvas.height = window.innerHeight / 2;
+    }
+
+    // interpolate between two colors
+    function interpolateColor(color1, color2, factor) {
+        let r = color1[0] + factor * (color2[0] - color1[0]);
+        let g = color1[1] + factor * (color2[1] - color1[1]);
+        let b = color1[2] + factor * (color2[2] - color1[2]);
+
+        return [Math.round(r), Math.round(g), Math.round(b)];
+    }
+
+    // number to hex
+    function toHex(num) {
+        let hex = Math.floor(num).toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }
+
+    // hex to rgb
+    function hexToRgb(hex) {
+        let bigint = parseInt(hex.slice(1), 16);
+        let r = (bigint >> 16) & 255;
+        let g = (bigint >> 8) & 255;
+        let b = bigint & 255;
+
+        return [r, g, b];
+    }
+
+    // Create gradient
+    var gradient = function (color1, color2, alpha, horizontal = true) {
+        let gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        if (!horizontal) gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        let rgb1 = hexToRgb(color1);
+        let rgb2 = hexToRgb(color2);
+
+        gradient.addColorStop(0, `rgba(${rgb1[0]},${rgb1[1]},${rgb1[2]},${alpha})`);
+        gradient.addColorStop(1, `rgba(${rgb2[0]},${rgb2[1]},${rgb2[2]},${alpha})`);
+
+        return gradient;
+    };
+
+    // handle settings toggle
+    document.getElementById('toggleSettings').addEventListener('click', function (e) {
+        e.preventDefault();
+        var link = document.getElementById('toggleSettings');
+        var settings = document.getElementById('settings');
+        // toggle the flipped class
+        link.classList.toggle('flipped');
+        settings.style.display = settings.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // setup application variables
+    let nodeCount = 22;
+    let nodeSize = +nodeSizeSlider.value;
+    //let nodeColor = nodeColorPicker.value;
+    let nodeStartColor = nodeColorPicker.value;
+    let nodeEndColor = nodeEndColorPicker.value;
+
+    let nodeTransparency = +nodeOpacitySlider.value;
+
+    let lineRange = +edgeRangeSlider.value;
+    let lineSize = +edgeWidthSlider.value;
+    let lineColor = edgeColorPicker.value;
+    let lineEndColor = edgeEndColorPicker.value;
+    let lineTransparency = +edgeOpacitySlider.value;
+
+    let simSpeed = +simSpeedSlider.value;
+    let simVariation = +simVarianceSlider.value;
+    let simPermeability = +simPermeableSlider.value; // Example: 0.5 means 50% of nodes wrap
+
+    let backgroundStartColor = backgroundColorPicker.value;
+    let backgroundEndColor = backgroundEndColorPicker.value;
+
+    // define a node class
+    class Node {
+        constructor(color) {
+            this.color = color;
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() * simSpeed) + (Math.random() * simVariation * (Math.random() < 0.5 ? -1 : 1));
+            this.vy = (Math.random() * simSpeed) + (Math.random() * simVariation * (Math.random() < 0.5 ? -1 : 1));
+        }
+
+        // node position
+        update() {
+            if (Math.random() > simPermeability) {
+                if (this.x < 0 || this.x > canvas.width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > canvas.height) this.vy = -this.vy;
+            } else {
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            this.x += this.vx;
+            this.y += this.vy;
+        }
+
+        // display the node
+        draw() {
+            //ctx.fillStyle = `${nodeColor}${Math.floor(nodeTransparency * 255).toString(16)}`;
+            // Convert this.color from rgb(r, g, b) to rgba(r, g, b, a)
+            let rgbaColor = this.color.replace('rgb', 'rgba').replace(')', `, ${nodeTransparency})`);
+            ctx.fillStyle = rgbaColor;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, nodeSize, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // simulation nodes
+    let nodes = [];
+    function generateNodes() {
+        nodeStartColor = nodeColorPicker.value;
+        nodeEndColor = nodeEndColorPicker.value;
+        simSpeed = +simSpeedSlider.value;
+        simVariation = +simVarianceSlider.value;
+        nodes = []; // Reset the nodes array
+        for (let i = 0; i < nodeCount; i++) {
+            let factor = i / nodeCount;
+            let interpolatedColor = interpolateColor(hexToRgb(nodeStartColor), hexToRgb(nodeEndColor), factor);
+            let colorString = `rgb(${interpolatedColor[0]}, ${interpolatedColor[1]}, ${interpolatedColor[2]})`;
+            nodes.push(new Node(colorString));
+        }
+    }
+    generateNodes();
+
+    // draw the edges
+    function connectNodes(node1, node2) {
+        let dist = Math.sqrt((node1.x - node2.x) ** 2 + (node1.y - node2.y) ** 2);
+        if (dist < lineRange) {
+            let opacity = 1.1 - (dist / lineRange);
+            //ctx.strokeStyle = `${lineColor}${Math.floor(opacity * 255).toString(16)}`;
+            ctx.strokeStyle = gradient(lineColor, lineEndColor, opacity * lineTransparency, edgeHorizontalGradient.checked);
+            ctx.lineCap = 'round';
+            ctx.lineWidth = lineSize;
+            ctx.beginPath();
+            ctx.moveTo(node1.x, node1.y);
+            ctx.lineTo(node2.x, node2.y);
+            ctx.stroke();
+        }
+    }
+
+    // animation loop
+    function animate() {
+        // get updated values
+        nodeSize = +nodeSizeSlider.value;
+        //nodeColor = nodeColorPicker.value;
+        nodeTransparency = +nodeOpacitySlider.value;
+
+        lineRange = +edgeRangeSlider.value;
+        lineSize = +edgeWidthSlider.value;
+        lineColor = edgeColorPicker.value;
+        lineEndColor = edgeEndColorPicker.value;
+        lineTransparency = +edgeOpacitySlider.value;
+
+        backgroundStartColor = backgroundColorPicker.value;
+        backgroundEndColor = backgroundEndColorPicker.value;
+
+        //simSpeed = +simSpeedSlider.value;
+        //simVariation = +simVarianceSlider.value;
+        simPermeability = +simPermeableSlider.value;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = gradient(backgroundStartColor, backgroundEndColor, 1.0, backgroundHorizontalGradient.checked);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < nodes.length; i++) {
+            nodes[i].update();
+            nodes[i].draw();
+            for (let j = i + 1; j < nodes.length; j++) {
+                connectNodes(nodes[i], nodes[j]);
+            }
+        }
+
+        requestAnimationFrame(animate);
+    }
+    // go!
+    animate();
+
+    // Handle resizing
+    window.addEventListener('resize', updateCanvasSize);
+    updateCanvasSize();
+
+    // setup starting state
+    var settings = document.getElementById('settings');
+    //settings.style.display = 'none';
+</script>
+
+</html>
